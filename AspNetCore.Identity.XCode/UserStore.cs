@@ -263,7 +263,7 @@ namespace AspNetCore.Identity.XCode
         /// <returns>The user login if it exists.</returns>
         protected override Task<TUserLogin> FindUserLoginAsync(int userId, string loginProvider, string providerKey, CancellationToken cancellationToken)
         {
-            return Task.FromResult(IdentityUserLogin<TUserLogin>.FindByUserIdLoginProviderAndProviderKey(userId, loginProvider, providerKey));
+            return Task.FromResult(IdentityUserLogin<TUserLogin>.FindByUserIdAndLoginProviderAndProviderKey(userId, loginProvider, providerKey));
         }
 
         /// <summary>

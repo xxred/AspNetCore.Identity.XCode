@@ -138,7 +138,7 @@ namespace Extensions.Identity.Stores.XCode
         /// <param name="loginprovider">登录提供者</param>
         /// <param name="providerkey">提供者标识符</param>
         /// <returns>实体</returns>
-        public static TEntity FindByUserIdLoginProviderAndProviderKey(Int32 userid, String loginprovider, String providerkey)
+        public static TEntity FindByUserIdAndLoginProviderAndProviderKey(Int32 userid, String loginprovider, String providerkey)
         {
             // 实体缓存
             if (Meta.Session.Count < 1000) return Meta.Cache.Find(e => e.UserId == userid && e.LoginProvider == loginprovider && e.ProviderKey == providerkey);

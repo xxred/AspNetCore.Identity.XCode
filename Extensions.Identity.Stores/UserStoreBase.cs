@@ -228,19 +228,6 @@ namespace Extensions.Identity.Stores.XCode
         public abstract Task<TUser> FindByIdAsync(string userId, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Converts the provided <paramref name="id"/> to a strongly typed key object.
-        /// </summary>
-        /// <param name="id">The id to convert.</param>
-        public virtual int ConvertIdFromString(string id)
-        {
-            if (id == null)
-            {
-                return default(int);
-            }
-            return (int)TypeDescriptor.GetConverter(typeof(int)).ConvertFromInvariantString(id);
-        }
-
-        /// <summary>
         /// Converts the provided <paramref name="id"/> to its string representation.
         /// </summary>
         /// <param name="id">The id to convert.</param>
