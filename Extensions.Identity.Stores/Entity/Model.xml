@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Tables Version="9.11.7012.14589" NameSpace="Extensions.Identity.Stores.XCode" ConnName="Users" Output="../" BaseClass="Entity" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:schemaLocation="http://www.newlifex.com https://doc.newlifex.com/ModelSchema.xsd" xmlns="http://www.newlifex.com/ModelSchema.xsd">
+  <Table Name="IdentityRole" Description="IdentityRole(角色)" RenderGenEntity="True">
+    <Columns>
+      <Column Name="Id" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
+      <Column Name="Name" DataType="String" Master="True" Nullable="False" Description="名称" />
+      <Column Name="NormalizedName" DataType="String" Master="True" Nullable="False" Description="名称" />
+      <Column Name="ConcurrencyStamp" DataType="String" Description="存储随机值(当用户被持久化到存储时必须更改的随机值)" />
+      <Column Name="IsSystem" DataType="Boolean" Description="系统。用于业务系统开发使用，不受数据权限约束，禁止修改名称或删除" />
+      <Column Name="Remark" DataType="String" Description="说明" />
+      <Column Name="CreateUserID" DataType="Int32" Description="创建用户" />
+      <Column Name="CreateIP" DataType="String" Description="创建地址" />
+      <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
+      <Column Name="UpdateUserID" DataType="Int32" Description="更新用户" />
+      <Column Name="UpdateIP" DataType="String" Description="更新地址" />
+      <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
+    </Columns>
+    <Indexes>
+      <Index Columns="Name" Unique="True" />
+    </Indexes>
+  </Table>
+  <Table Name="IdentityRoleClaim" Description="IdentityRoleClaim(角色声明集合)" RenderGenEntity="True">
+    <Columns>
+      <Column Name="Id" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
+      <Column Name="RoleId" DataType="Int32" Description="角色编号" />
+      <Column Name="ClaimType" DataType="String" Nullable="False" Description="声明类型" />
+      <Column Name="ClaimValue" DataType="String" Nullable="False" Description="声明值" />
+    </Columns>
+    <Indexes>
+      <Index Columns="RoleId" />
+    </Indexes>
+  </Table>
+  <Table Name="IdentityUser" Description="IdentityUser(用户)" DbType="SqlServer" RenderGenEntity="True">
+    <Columns>
+      <Column Name="Id" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
+      <Column Name="UserName" DataType="String" Master="True" Nullable="False" Description="名称。登录用户名" />
+      <Column Name="NormalizedUserName" DataType="String" Master="True" Nullable="False" Description="友好显示名" />
+      <Column Name="Email" DataType="String" Description="邮件" />
+      <Column Name="NormalizedEmail" DataType="String" Description="规范化的邮件" />
+      <Column Name="EmailConfirmed" DataType="Boolean" Description="邮箱验证(指示用户是否已验证其邮箱)" />
+      <Column Name="PasswordHash" DataType="String" Description="密码哈希(获取或设置此用户密码的salt和hash表示形式)" />
+      <Column Name="SecurityStamp" DataType="String" Description="凭据随机值(当用户凭据更改时必须更改的随机值,比如更改密码、删除登录名)" />
+      <Column Name="ConcurrencyStamp" DataType="String" Description="存储随机值(当用户被持久化到存储时必须更改的随机值)" />
+      <Column Name="PhoneNumber" DataType="String" Description="手机号" />
+      <Column Name="PhoneNumberConfirmed" DataType="Boolean" Description="手机号验证(指示用户是否已验证其手机号)" />
+      <Column Name="TwoFactorEnabled" DataType="Boolean" Description="双重验证(指示是否为此用户启用了双重身份验证)" />
+      <Column Name="LockoutEnd" DataType="DateTime" Description="最后锁定时间" />
+      <Column Name="LockoutEnabled" DataType="Boolean" Description="启用锁定" />
+      <Column Name="AccessFailedCount" DataType="Int32" Description="失败登录尝试次数" />
+      <Column Name="Sex" DataType="Int32" Description="性别。未知-1、男1、女0" />
+      <Column Name="Code" DataType="String" Description="代码。身份证、员工编号等" />
+      <Column Name="Avatar" DataType="String" Length="200" Description="头像" />
+      <Column Name="Online" DataType="Boolean" Description="在线" />
+      <Column Name="Enable" DataType="Boolean" Description="启用" />
+      <Column Name="Logins" DataType="Int32" Description="登录次数" />
+      <Column Name="LastLogin" DataType="DateTime" Description="最后登录" />
+      <Column Name="LastLoginIP" DataType="String" Description="最后登录IP" />
+      <Column Name="RegisterTime" DataType="DateTime" Description="注册时间" />
+      <Column Name="RegisterIP" DataType="String" Description="注册IP" />
+    </Columns>
+    <Indexes>
+      <Index Columns="UserName" Unique="True" />
+      <Index Columns="Email" />
+      <Index Columns="PhoneNumber" />
+    </Indexes>
+  </Table>
+  <Table Name="IdentityUserClaim" Description="IdentityUserClaim(用户声明集合)" RenderGenEntity="True">
+    <Columns>
+      <Column Name="Id" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
+      <Column Name="UserId" DataType="Int32" Description="用户编号" />
+      <Column Name="ClaimType" DataType="String" Nullable="False" Description="声明类型" />
+      <Column Name="ClaimValue" DataType="String" Nullable="False" Description="声明值" />
+    </Columns>
+    <Indexes>
+      <Index Columns="UserId" />
+    </Indexes>
+  </Table>
+  <Table Name="IdentityUserLogin" Description="IdentityUserLogin(用户的登录及其关联的提供程序)" RenderGenEntity="True">
+    <Columns>
+      <Column Name="Id" DataType="Int32" Identity="True" Description="编号" />
+      <Column Name="UserId" DataType="Int32" Description="用户编号" />
+      <Column Name="LoginProvider" DataType="String" PrimaryKey="True" Nullable="False" Description="登录提供者" />
+      <Column Name="ProviderKey" DataType="String" PrimaryKey="True" Nullable="False" Description="提供者标识符(此次登录提供程序唯一标识符)" />
+      <Column Name="ProviderDisplayName" DataType="String" Description="提供者名称(登录提供程序友好名称)" />
+    </Columns>
+    <Indexes>
+      <Index Columns="UserId" />
+      <Index Name="IX_IdentityUserRole_LoginProvider_ProviderKey" Columns="LoginProvider,ProviderKey" PrimaryKey="True" />
+    </Indexes>
+  </Table>
+  <Table Name="IdentityUserRole" Description="IdentityUserRole(用户角色关联)" RenderGenEntity="True">
+    <Columns>
+      <Column Name="Id" DataType="Int32" Identity="True" Description="编号" />
+      <Column Name="UserId" DataType="Int32" PrimaryKey="True" Description="用户编号" />
+      <Column Name="RoleId" DataType="Int32" PrimaryKey="True" Description="角色编号" />
+    </Columns>
+    <Indexes>
+      <Index Columns="UserId" />
+      <Index Columns="RoleId" />
+    </Indexes>
+  </Table>
+  <Table Name="IdentityUserToken" Description="IdentityUserToken(用户的身份验证令牌)" DisplayName="IdentityUserToken" RenderGenEntity="True">
+    <Columns>
+      <Column Name="Id" DataType="Int32" Identity="True" Description="编号" />
+      <Column Name="UserId" DataType="Int32" PrimaryKey="True" Description="用户编号" />
+      <Column Name="LoginProvider" DataType="String" PrimaryKey="True" Nullable="False" Description="登录提供者" />
+      <Column Name="Name" DataType="String" PrimaryKey="True" Master="True" Nullable="False" Description="token名" />
+      <Column Name="Value" DataType="String" Description="token" />
+    </Columns>
+    <Indexes>
+      <Index Name="IX_IdentityUserToken_UserId" Columns="UserId" PrimaryKey="True" />
+      <Index Columns="LoginProvider" />
+      <Index Columns="UserId,LoginProvider" />
+      <Index Name="IX_IdentityUserToken_UserId_LoginProvider_Name" Columns="UserId,LoginProvider,Name" PrimaryKey="True" />
+    </Indexes>
+  </Table>
+</Tables>

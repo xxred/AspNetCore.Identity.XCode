@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Extensions.Identity.Stores.XCode</RootNamespace>
+    <AssemblyName>Extensions.Identity.Stores.XCode</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Entity\Config\**" />
+    <Compile Remove="Entity\Log\**" />
+    <EmbeddedResource Remove="Entity\Config\**" />
+    <EmbeddedResource Remove="Entity\Log\**" />
+    <None Remove="Entity\Config\**" />
+    <None Remove="Entity\Log\**" />
+  </ItemGroup>
+
+  
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="2.2.0" />
+    <PackageReference Include="NewLife.XCode" Version="9.11.2019.314" />
+  </ItemGroup>
+
+  
+
+  <ItemGroup>
+    <None Update="Entity\Build.log">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Build.tt</DependentUpon>
+    </None>
+    <None Update="Entity\Build.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Build.log</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <!--<Import Project="Entity/CopyDll.props"></Import>-->
+</Project>
