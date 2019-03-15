@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Extensions.Identity.Stores.XCode;
 using Microsoft.AspNetCore.Identity;
+using XCode;
 
 namespace AspNetCore.Identity.XCode
 {
@@ -32,22 +33,6 @@ namespace AspNetCore.Identity.XCode
     {
         /// <summary>
         /// Constructs a new instance of <see cref="UserStore{TUser}"/>.
-        /// </summary>
-        /// <param name="describer">The <see cref="IdentityErrorDescriber"/>.</param>
-        public UserStore(IdentityErrorDescriber describer = null) : base(describer) { }
-    }
-
-    /// <summary>
-    /// Represents a new instance of a persistence store for the specified user and role types.
-    /// </summary>
-    /// <typeparam name="TUser">The type representing a user.</typeparam>
-    /// <typeparam name="TRole">The type representing a role.</typeparam>
-    public class UserStore<TUser, TRole> : UserStore<TUser, TRole>
-        where TUser : IdentityUser<TUser>, new()
-        where TRole : IdentityRole<TRole>, new()
-    {
-        /// <summary>
-        /// Constructs a new instance of <see cref="UserStore{TUser, TRole}"/>.
         /// </summary>
         /// <param name="describer">The <see cref="IdentityErrorDescriber"/>.</param>
         public UserStore(IdentityErrorDescriber describer = null) : base(describer) { }
@@ -84,11 +69,11 @@ namespace AspNetCore.Identity.XCode
         IProtectedUserStore<TUser>
         where TUser : IdentityUser<TUser>, new()
         where TRole : IdentityRole<TRole>, new()
-        where TUserClaim : IdentityUserClaim, new()
-        where TUserRole : IdentityUserRole, new()
-        where TUserLogin : IdentityUserLogin, new()
-        where TUserToken : IdentityUserToken, new()
-        where TRoleClaim : IdentityRoleClaim, new()
+        where TUserClaim : IdentityUserClaim<TUserClaim>, new()
+        where TUserRole : IdentityUserRole<TUserRole>, new()
+        where TUserLogin : IdentityUserLogin<TUserLogin>, new()
+        where TUserToken : IdentityUserToken<TUserToken>, new()
+        where TRoleClaim : IdentityRoleClaim<TRoleClaim>, new()
     {
         /// <summary>
         /// Creates a new instance of the store.
@@ -98,12 +83,14 @@ namespace AspNetCore.Identity.XCode
         {
         }
 
-        private DbSet<TUser> UsersSet { get { return Context.Set<TUser>(); } }
-        private DbSet<TRole> Roles { get { return Context.Set<TRole>(); } }
-        private DbSet<TUserClaim> UserClaims { get { return Context.Set<TUserClaim>(); } }
-        private DbSet<TUserRole> UserRoles { get { return Context.Set<TUserRole>(); } }
-        private DbSet<TUserLogin> UserLogins { get { return Context.Set<TUserLogin>(); } }
-        private DbSet<TUserToken> UserTokens { get { return Context.Set<TUserToken>(); } }
+        private List<EntityBase> Context = new List<EntityBase>();
+
+        //private DbSet<TUser> UsersSet { get { return Context.Set<TUser>(); } }
+        //private DbSet<TRole> Roles { get { return Context.Set<TRole>(); } }
+        //private DbSet<TUserClaim> UserClaims { get { return Context.Set<TUserClaim>(); } }
+        //private DbSet<TUserRole> UserRoles { get { return Context.Set<TUserRole>(); } }
+        //private DbSet<TUserLogin> UserLogins { get { return Context.Set<TUserLogin>(); } }
+        //private DbSet<TUserToken> UserTokens { get { return Context.Set<TUserToken>(); } }
 
         /// <summary>
         /// Gets or sets a flag indicating if changes should be persisted after CreateAsync, UpdateAsync and DeleteAsync are called.
@@ -118,7 +105,8 @@ namespace AspNetCore.Identity.XCode
         /// <returns>The <see cref="Task"/> that represents the asynchronous operation.</returns>
         protected Task SaveChanges(CancellationToken cancellationToken)
         {
-            return AutoSaveChanges ? Context.SaveChangesAsync(cancellationToken) : Task.CompletedTask;
+            Context.Save();
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -127,7 +115,7 @@ namespace AspNetCore.Identity.XCode
         /// <param name="user">The user to create.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/> of the creation operation.</returns>
-        public async override Task<IdentityResult> CreateAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        public override async Task<IdentityResult> CreateAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -146,7 +134,7 @@ namespace AspNetCore.Identity.XCode
         /// <param name="user">The user to update.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/> of the update operation.</returns>
-        public async override Task<IdentityResult> UpdateAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        public override async Task<IdentityResult> UpdateAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -155,14 +143,14 @@ namespace AspNetCore.Identity.XCode
                 throw new ArgumentNullException(nameof(user));
             }
 
-            Context.Attach(user);
+            Context.Add(user);
             user.ConcurrencyStamp = Guid.NewGuid().ToString();
-            Context.Update(user);
+
             try
             {
                 await SaveChanges(cancellationToken);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception)
             {
                 return IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure());
             }
@@ -175,7 +163,7 @@ namespace AspNetCore.Identity.XCode
         /// <param name="user">The user to delete.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/> of the update operation.</returns>
-        public async override Task<IdentityResult> DeleteAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        public override async Task<IdentityResult> DeleteAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -189,7 +177,7 @@ namespace AspNetCore.Identity.XCode
             {
                 await SaveChanges(cancellationToken);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception)
             {
                 return IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure());
             }
@@ -208,8 +196,7 @@ namespace AspNetCore.Identity.XCode
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
-            var id = ConvertIdFromString(userId);
-            return UsersSet.FindAsync(new object[] { id }, cancellationToken);
+            return Task.FromResult(IdentityUser<TUser>.FindById(userId.ToInt()));
         }
 
         /// <summary>
@@ -224,16 +211,13 @@ namespace AspNetCore.Identity.XCode
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
-            return Users.FirstOrDefaultAsync(u => u.NormalizedUserName == normalizedUserName, cancellationToken);
+            return Task.FromResult(IdentityUser<TUser>.FindByUserName(normalizedUserName));
         }
 
         /// <summary>
         /// A navigation property for the users the store contains.
         /// </summary>
-        public override IQueryable<TUser> Users
-        {
-            get { return UsersSet; }
-        }
+        public override IQueryable<TUser> Users => throw new NotImplementedException();
 
         /// <summary>
         /// Return a role with the normalized name if it exists.
@@ -243,7 +227,7 @@ namespace AspNetCore.Identity.XCode
         /// <returns>The role if it exists.</returns>
         protected override Task<TRole> FindRoleAsync(string normalizedRoleName, CancellationToken cancellationToken)
         {
-            return Roles.SingleOrDefaultAsync(r => r.NormalizedName == normalizedRoleName, cancellationToken);
+            return Task.FromResult(IdentityRole<TRole>.FindByNormalizedName(normalizedRoleName));
         }
 
         /// <summary>
@@ -253,9 +237,9 @@ namespace AspNetCore.Identity.XCode
         /// <param name="roleId">The role's id.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>The user role if it exists.</returns>
-        protected override Task<TUserRole> FindUserRoleAsync(TKey userId, TKey roleId, CancellationToken cancellationToken)
+        protected override Task<TUserRole> FindUserRoleAsync(int userId, int roleId, CancellationToken cancellationToken)
         {
-            return UserRoles.FindAsync(new object[] { userId, roleId }, cancellationToken);
+            return Task.FromResult(IdentityUserRole<TUserRole>.FindAllByUserIdAndRoleId(userId, roleId));
         }
 
         /// <summary>
@@ -264,9 +248,9 @@ namespace AspNetCore.Identity.XCode
         /// <param name="userId">The user's id.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>The user if it exists.</returns>
-        protected override Task<TUser> FindUserAsync(TKey userId, CancellationToken cancellationToken)
+        protected override Task<TUser> FindUserAsync(int userId, CancellationToken cancellationToken)
         {
-            return Users.SingleOrDefaultAsync(u => u.Id.Equals(userId), cancellationToken);
+            return Task.FromResult(IdentityUser<TUser>.FindById(userId));
         }
 
         /// <summary>
@@ -277,9 +261,9 @@ namespace AspNetCore.Identity.XCode
         /// <param name="providerKey">The key provided by the <paramref name="loginProvider"/> to identify a user.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>The user login if it exists.</returns>
-        protected override Task<TUserLogin> FindUserLoginAsync(TKey userId, string loginProvider, string providerKey, CancellationToken cancellationToken)
+        protected override Task<TUserLogin> FindUserLoginAsync(int userId, string loginProvider, string providerKey, CancellationToken cancellationToken)
         {
-            return UserLogins.SingleOrDefaultAsync(userLogin => userLogin.UserId.Equals(userId) && userLogin.LoginProvider == loginProvider && userLogin.ProviderKey == providerKey, cancellationToken);
+            return Task.FromResult(IdentityUserLogin<TUserLogin>.FindByUserIdLoginProviderAndProviderKey(userId, loginProvider, providerKey));
         }
 
         /// <summary>
@@ -291,7 +275,7 @@ namespace AspNetCore.Identity.XCode
         /// <returns>The user login if it exists.</returns>
         protected override Task<TUserLogin> FindUserLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
         {
-            return UserLogins.SingleOrDefaultAsync(userLogin => userLogin.LoginProvider == loginProvider && userLogin.ProviderKey == providerKey, cancellationToken);
+            return Task.FromResult(IdentityUserLogin<TUserLogin>.FindByLoginProviderAndProviderKey(loginProvider, providerKey));
         }
 
 
@@ -302,7 +286,7 @@ namespace AspNetCore.Identity.XCode
         /// <param name="normalizedRoleName">The role to add.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>The <see cref="Task"/> that represents the asynchronous operation.</returns>
-        public async override Task AddToRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
+        public override async Task AddToRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -312,14 +296,15 @@ namespace AspNetCore.Identity.XCode
             }
             if (string.IsNullOrWhiteSpace(normalizedRoleName))
             {
-                throw new ArgumentException(Resources.ValueCannotBeNullOrEmpty, nameof(normalizedRoleName));
+                throw new ArgumentException(nameof(normalizedRoleName));
             }
             var roleEntity = await FindRoleAsync(normalizedRoleName, cancellationToken);
             if (roleEntity == null)
             {
-                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.RoleNotFound, normalizedRoleName));
+                throw new InvalidOperationException($"找不到名为{normalizedRoleName}的角色");
             }
-            UserRoles.Add(CreateUserRole(user, roleEntity));
+
+            CreateUserRole(user, roleEntity).Save();
         }
 
         /// <summary>
@@ -329,7 +314,7 @@ namespace AspNetCore.Identity.XCode
         /// <param name="normalizedRoleName">The role to remove.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>The <see cref="Task"/> that represents the asynchronous operation.</returns>
-        public async override Task RemoveFromRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
+        public override async Task RemoveFromRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -339,16 +324,13 @@ namespace AspNetCore.Identity.XCode
             }
             if (string.IsNullOrWhiteSpace(normalizedRoleName))
             {
-                throw new ArgumentException(Resources.ValueCannotBeNullOrEmpty, nameof(normalizedRoleName));
+                throw new ArgumentException(nameof(normalizedRoleName));
             }
             var roleEntity = await FindRoleAsync(normalizedRoleName, cancellationToken);
             if (roleEntity != null)
             {
                 var userRole = await FindUserRoleAsync(user.Id, roleEntity.Id, cancellationToken);
-                if (userRole != null)
-                {
-                    UserRoles.Remove(userRole);
-                }
+                userRole?.Delete();
             }
         }
 
@@ -358,7 +340,7 @@ namespace AspNetCore.Identity.XCode
         /// <param name="user">The user whose roles should be retrieved.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>A <see cref="Task{TResult}"/> that contains the roles the user is a member of.</returns>
-        public override async Task<IList<string>> GetRolesAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        public override Task<IList<string>> GetRolesAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -367,11 +349,9 @@ namespace AspNetCore.Identity.XCode
                 throw new ArgumentNullException(nameof(user));
             }
             var userId = user.Id;
-            var query = from userRole in UserRoles
-                        join role in Roles on userRole.RoleId equals role.Id
-                        where userRole.UserId.Equals(userId)
-                        select role.Name;
-            return await query.ToListAsync(cancellationToken);
+            var userRoles = IdentityUserRole<TUserRole>.FindAllByUserId(userId);
+            var roles = IdentityRole<TRole>.FindAllByRoleIds(userRoles.Select(s => s.Id).ToList());
+            return Task.FromResult((IList<string>)roles.Select(s => s.Name).ToList());
         }
 
         /// <summary>
@@ -392,7 +372,7 @@ namespace AspNetCore.Identity.XCode
             }
             if (string.IsNullOrWhiteSpace(normalizedRoleName))
             {
-                throw new ArgumentException(Resources.ValueCannotBeNullOrEmpty, nameof(normalizedRoleName));
+                throw new ArgumentException(nameof(normalizedRoleName));
             }
             var role = await FindRoleAsync(normalizedRoleName, cancellationToken);
             if (role != null)
@@ -409,7 +389,7 @@ namespace AspNetCore.Identity.XCode
         /// <param name="user">The user whose claims should be retrieved.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>A <see cref="Task{TResult}"/> that contains the claims granted to a user.</returns>
-        public async override Task<IList<Claim>> GetClaimsAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        public override Task<IList<Claim>> GetClaimsAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             ThrowIfDisposed();
             if (user == null)
@@ -417,7 +397,8 @@ namespace AspNetCore.Identity.XCode
                 throw new ArgumentNullException(nameof(user));
             }
 
-            return await UserClaims.Where(uc => uc.UserId.Equals(user.Id)).Select(c => c.ToClaim()).ToListAsync(cancellationToken);
+            return Task.FromResult((IList<Claim>)IdentityUserClaim<TUserClaim>.FindAllByUserId(user.Id)
+                .Select(c => c.ToClaim()).ToList());
         }
 
         /// <summary>
@@ -440,7 +421,7 @@ namespace AspNetCore.Identity.XCode
             }
             foreach (var claim in claims)
             {
-                UserClaims.Add(CreateUserClaim(user, claim));
+                CreateUserClaim(user, claim).Save();
             }
             return Task.FromResult(false);
         }
@@ -453,7 +434,7 @@ namespace AspNetCore.Identity.XCode
         /// <param name="newClaim">The new claim replacing the <paramref name="claim"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>The <see cref="Task"/> that represents the asynchronous operation.</returns>
-        public async override Task ReplaceClaimAsync(TUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken = default(CancellationToken))
+        public override async Task ReplaceClaimAsync(TUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken = default(CancellationToken))
         {
             ThrowIfDisposed();
             if (user == null)
@@ -469,7 +450,8 @@ namespace AspNetCore.Identity.XCode
                 throw new ArgumentNullException(nameof(newClaim));
             }
 
-            var matchedClaims = await UserClaims.Where(uc => uc.UserId.Equals(user.Id) && uc.ClaimValue == claim.Value && uc.ClaimType == claim.Type).ToListAsync(cancellationToken);
+            var matchedClaims = IdentityUserClaim<TUserClaim>.FindAllByUserIdAndTypeAndValue(user.Id, claim.Value, claim.Type);
+
             foreach (var matchedClaim in matchedClaims)
             {
                 matchedClaim.ClaimValue = newClaim.Value;
@@ -484,7 +466,7 @@ namespace AspNetCore.Identity.XCode
         /// <param name="claims">The claim to remove.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>The <see cref="Task"/> that represents the asynchronous operation.</returns>
-        public async override Task RemoveClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default(CancellationToken))
+        public override async Task RemoveClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default(CancellationToken))
         {
             ThrowIfDisposed();
             if (user == null)
@@ -497,11 +479,8 @@ namespace AspNetCore.Identity.XCode
             }
             foreach (var claim in claims)
             {
-                var matchedClaims = await UserClaims.Where(uc => uc.UserId.Equals(user.Id) && uc.ClaimValue == claim.Value && uc.ClaimType == claim.Type).ToListAsync(cancellationToken);
-                foreach (var c in matchedClaims)
-                {
-                    UserClaims.Remove(c);
-                }
+                var matchedClaims = IdentityUserClaim<TUserClaim>.FindAllByUserIdAndTypeAndValue(user.Id, claim.Value, claim.Type);
+                matchedClaims.Delete();
             }
         }
 
@@ -525,7 +504,8 @@ namespace AspNetCore.Identity.XCode
             {
                 throw new ArgumentNullException(nameof(login));
             }
-            UserLogins.Add(CreateUserLogin(user, login));
+
+            CreateUserLogin(user, login).Save();
             return Task.FromResult(false);
         }
 
@@ -547,10 +527,7 @@ namespace AspNetCore.Identity.XCode
                 throw new ArgumentNullException(nameof(user));
             }
             var entry = await FindUserLoginAsync(user.Id, loginProvider, providerKey, cancellationToken);
-            if (entry != null)
-            {
-                UserLogins.Remove(entry);
-            }
+            entry?.Delete();
         }
 
         /// <summary>
@@ -561,7 +538,7 @@ namespace AspNetCore.Identity.XCode
         /// <returns>
         /// The <see cref="Task"/> for the asynchronous operation, containing a list of <see cref="UserLoginInfo"/> for the specified <paramref name="user"/>, if any.
         /// </returns>
-        public async override Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        public override Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -570,8 +547,9 @@ namespace AspNetCore.Identity.XCode
                 throw new ArgumentNullException(nameof(user));
             }
             var userId = user.Id;
-            return await UserLogins.Where(l => l.UserId.Equals(userId))
-                .Select(l => new UserLoginInfo(l.LoginProvider, l.ProviderKey, l.ProviderDisplayName)).ToListAsync(cancellationToken);
+            return Task.FromResult(
+             (IList<UserLoginInfo>)IdentityUserLogin<TUserLogin>.FindAllByUserId(userId)
+                 .Select(l => new UserLoginInfo(l.LoginProvider, l.ProviderKey, l.ProviderDisplayName)).ToList());
         }
 
         /// <summary>
@@ -583,7 +561,7 @@ namespace AspNetCore.Identity.XCode
         /// <returns>
         /// The <see cref="Task"/> for the asynchronous operation, containing the user, if any which matched the specified login provider and key.
         /// </returns>
-        public async override Task<TUser> FindByLoginAsync(string loginProvider, string providerKey,
+        public override async Task<TUser> FindByLoginAsync(string loginProvider, string providerKey,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -608,7 +586,7 @@ namespace AspNetCore.Identity.XCode
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
-            return Users.FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail, cancellationToken);
+            return Task.FromResult(IdentityUser<TUser>.FindByNormalizedUserName(normalizedEmail));
         }
 
         /// <summary>
@@ -619,7 +597,7 @@ namespace AspNetCore.Identity.XCode
         /// <returns>
         /// The <see cref="Task"/> contains a list of users, if any, that contain the specified claim. 
         /// </returns>
-        public async override Task<IList<TUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default(CancellationToken))
+        public override Task<IList<TUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -628,13 +606,9 @@ namespace AspNetCore.Identity.XCode
                 throw new ArgumentNullException(nameof(claim));
             }
 
-            var query = from userclaims in UserClaims
-                        join user in Users on userclaims.UserId equals user.Id
-                        where userclaims.ClaimValue == claim.Value
-                        && userclaims.ClaimType == claim.Type
-                        select user;
-
-            return await query.ToListAsync(cancellationToken);
+            var userClaims = IdentityUserClaim<TUserClaim>.FindAllByTypeAndValue(claim.Type, claim.Value);
+            var users = (IList<TUser>)IdentityUser<TUser>.FindAllByIds(userClaims.Select(s => s.Id).ToList());
+            return Task.FromResult(users);
         }
 
         /// <summary>
@@ -645,7 +619,7 @@ namespace AspNetCore.Identity.XCode
         /// <returns>
         /// The <see cref="Task"/> contains a list of users, if any, that are in the specified role. 
         /// </returns>
-        public async override Task<IList<TUser>> GetUsersInRoleAsync(string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
+        public override async Task<IList<TUser>> GetUsersInRoleAsync(string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -658,13 +632,12 @@ namespace AspNetCore.Identity.XCode
 
             if (role != null)
             {
-                var query = from userrole in UserRoles
-                            join user in Users on userrole.UserId equals user.Id
-                            where userrole.RoleId.Equals(role.Id)
-                            select user;
+                var userRoles = IdentityUserRole<TUserRole>.FindAllByRoleId(role.Id);
+                var users = IdentityUser<TUser>.FindAllByIds(userRoles.Select(s => s.UserId).ToList());
 
-                return await query.ToListAsync(cancellationToken);
+                 return users;
             }
+
             return new List<TUser>();
         }
 
@@ -677,7 +650,7 @@ namespace AspNetCore.Identity.XCode
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>The user token if it exists.</returns>
         protected override Task<TUserToken> FindTokenAsync(TUser user, string loginProvider, string name, CancellationToken cancellationToken)
-            => UserTokens.FindAsync(new object[] { user.Id, loginProvider, name }, cancellationToken);
+            => Task.FromResult(IdentityUserToken<TUserToken>.FindByUserIdAndLoginProviderAndName(user.Id, loginProvider, name));
 
         /// <summary>
         /// Add a new user token.
@@ -686,7 +659,7 @@ namespace AspNetCore.Identity.XCode
         /// <returns></returns>
         protected override Task AddUserTokenAsync(TUserToken token)
         {
-            UserTokens.Add(token);
+            token.Save();
             return Task.CompletedTask;
         }
 
@@ -698,7 +671,7 @@ namespace AspNetCore.Identity.XCode
         /// <returns></returns>
         protected override Task RemoveUserTokenAsync(TUserToken token)
         {
-            UserTokens.Remove(token);
+            token.Delete();
             return Task.CompletedTask;
         }
     }

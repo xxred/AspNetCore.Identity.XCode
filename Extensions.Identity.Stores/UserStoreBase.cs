@@ -29,10 +29,10 @@ namespace Extensions.Identity.Stores.XCode
         IUserAuthenticationTokenStore<TUser>,
         IUserAuthenticatorKeyStore<TUser>,
         IUserTwoFactorRecoveryCodeStore<TUser>
-        where TUser : IdentityUser
-        where TUserClaim : IdentityUserClaim, new()
-        where TUserLogin : IdentityUserLogin, new()
-        where TUserToken : IdentityUserToken, new()
+        where TUser : IdentityUser<TUser>, new()
+        where TUserClaim : IdentityUserClaim<TUserClaim>, new()
+        where TUserLogin : IdentityUserLogin<TUserLogin>, new()
+        where TUserToken : IdentityUserToken<TUserToken>, new()
     {
         /// <summary>
         /// Creates a new instance.
@@ -231,7 +231,6 @@ namespace Extensions.Identity.Stores.XCode
         /// Converts the provided <paramref name="id"/> to a strongly typed key object.
         /// </summary>
         /// <param name="id">The id to convert.</param>
-        /// <returns>An instance of <typeparamref name="TKey"/> representing the provided <paramref name="id"/>.</returns>
         public virtual int ConvertIdFromString(string id)
         {
             if (id == null)
@@ -1074,7 +1073,6 @@ namespace Extensions.Identity.Stores.XCode
     /// </summary>
     /// <typeparam name="TUser">The type representing a user.</typeparam>
     /// <typeparam name="TRole">The type representing a role.</typeparam>
-    /// <typeparam name="int">The type of the primary key for a role.</typeparam>
     /// <typeparam name="TUserClaim">The type representing a claim.</typeparam>
     /// <typeparam name="TUserRole">The type representing a user role.</typeparam>
     /// <typeparam name="TUserLogin">The type representing a user external login.</typeparam>
@@ -1083,13 +1081,13 @@ namespace Extensions.Identity.Stores.XCode
     public abstract class UserStoreBase<TUser, TRole, TUserClaim, TUserRole, TUserLogin, TUserToken, TRoleClaim> :
         UserStoreBase<TUser, TUserClaim, TUserLogin, TUserToken>,
         IUserRoleStore<TUser>
-        where TUser : IdentityUser
-        where TRole : IdentityRole
-        where TUserClaim : IdentityUserClaim, new()
-        where TUserRole : IdentityUserRole, new()
-        where TUserLogin : IdentityUserLogin, new()
-        where TUserToken : IdentityUserToken, new()
-        where TRoleClaim : IdentityRoleClaim, new()
+        where TUser : IdentityUser<TUser>, new()
+        where TRole : IdentityRole<TRole>, new()
+        where TUserClaim : IdentityUserClaim<TUserClaim>, new()
+        where TUserRole : IdentityUserRole<TUserRole>, new()
+        where TUserLogin : IdentityUserLogin<TUserLogin>, new()
+        where TUserToken : IdentityUserToken<TUserToken>, new()
+        where TRoleClaim : IdentityRoleClaim<TRoleClaim>, new()
     {
         /// <summary>
         /// Creates a new instance.

@@ -4,7 +4,7 @@
     <Columns>
       <Column Name="Id" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
       <Column Name="Name" DataType="String" Master="True" Nullable="False" Description="名称" />
-      <Column Name="NormalizedName" DataType="String" Master="True" Nullable="False" Description="名称" />
+      <Column Name="NormalizedName" DataType="String" Master="True" Nullable="False" Description="标准化名称" />
       <Column Name="ConcurrencyStamp" DataType="String" Description="存储随机值(当用户被持久化到存储时必须更改的随机值)" />
       <Column Name="IsSystem" DataType="Boolean" Description="系统。用于业务系统开发使用，不受数据权限约束，禁止修改名称或删除" />
       <Column Name="Remark" DataType="String" Description="说明" />

@@ -155,6 +155,35 @@ namespace Extensions.Identity.Stores.XCode
 
             return Find(_.Name == name);
         }
+
+        /// <summary>根据名称查找</summary>
+        /// <param name="normalizedName">名称</param>
+        /// <returns>实体对象</returns>
+        public static TEntity FindByNormalizedName(String normalizedName)
+        {
+            // 实体缓存
+            if (Meta.Session.Count < 1000) return Meta.Cache.Find(e => e.NormalizedName == normalizedName);
+
+            // 单对象缓存
+            //return Meta.SingleCache.GetItemWithSlaveKey(name) as TEntity;
+
+            return Find(_.NormalizedName == normalizedName);
+        }
+
+        /// <summary>根据名称查找</summary>
+        /// <param name="roleids">角色id列表</param>
+        /// <returns>实体对象</returns>
+        public static IList<TEntity> FindAllByRoleIds(List<int> roleids)
+        {
+            // 实体缓存
+            if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => roleids.Contains(e.Id));
+
+            // 单对象缓存
+            //return Meta.SingleCache.GetItemWithSlaveKey(name) as TEntity;
+
+            return FindAll(_.Id.In(roleids));
+        }
+        
         #endregion
 
         #region 高级查询

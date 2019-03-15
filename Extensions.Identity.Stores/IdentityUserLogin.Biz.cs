@@ -120,6 +120,31 @@ namespace Extensions.Identity.Stores.XCode
 
             return FindAll(_.LoginProvider == loginprovider & _.ProviderKey == providerkey);
         }
+
+        /// <summary>根据登录提供者、提供者标识符查找</summary>
+        /// <param name="loginprovider">登录提供者</param>
+        /// <param name="providerkey">提供者标识符</param>
+        /// <returns>实体</returns>
+        public static TEntity FindByLoginProviderAndProviderKey(String loginprovider, String providerkey)
+        {
+            // 实体缓存
+            if (Meta.Session.Count < 1000) return Meta.Cache.Find(e => e.LoginProvider == loginprovider && e.ProviderKey == providerkey);
+
+            return Find(_.LoginProvider == loginprovider & _.ProviderKey == providerkey);
+        }
+
+        /// <summary>根据用户id、登录提供者、提供者标识符查找</summary>
+        /// <param name="userid">用户id</param>
+        /// <param name="loginprovider">登录提供者</param>
+        /// <param name="providerkey">提供者标识符</param>
+        /// <returns>实体</returns>
+        public static TEntity FindByUserIdLoginProviderAndProviderKey(Int32 userid, String loginprovider, String providerkey)
+        {
+            // 实体缓存
+            if (Meta.Session.Count < 1000) return Meta.Cache.Find(e => e.UserId == userid && e.LoginProvider == loginprovider && e.ProviderKey == providerkey);
+
+            return Find(_.UserId == userid & _.LoginProvider == loginprovider & _.ProviderKey == providerkey);
+        }
         #endregion
 
         #region 高级查询

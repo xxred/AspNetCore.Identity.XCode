@@ -110,6 +110,18 @@ namespace Extensions.Identity.Stores.XCode
 
             return FindAll(_.RoleId == roleid);
         }
+
+        /// <summary>根据角色编号查找</summary>
+        /// <param name="userid">用户编号</param>
+        /// <param name="roleid">角色编号</param>
+        /// <returns>实体列表</returns>
+        public static TEntity FindAllByUserIdAndRoleId(Int32 userid, Int32 roleid)
+        {
+            // 实体缓存
+            if (Meta.Session.Count < 1000) return Meta.Cache.Find(e => e.UserId == userid && e.RoleId == roleid);
+
+            return Find(_.UserId == userid & _.RoleId == roleid);
+        }
         #endregion
 
         #region 高级查询

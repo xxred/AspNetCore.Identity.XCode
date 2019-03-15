@@ -167,6 +167,20 @@ namespace Extensions.Identity.Stores.XCode
             return Find(_.UserName == username);
         }
 
+        /// <summary>根据名称查找</summary>
+        /// <param name="normalizedUserName">名称</param>
+        /// <returns>实体对象</returns>
+        public static TEntity FindByNormalizedUserName(String normalizedUserName)
+        {
+            // 实体缓存
+            if (Meta.Session.Count < 1000) return Meta.Cache.Find(e => e.NormalizedUserName == normalizedUserName);
+
+            // 单对象缓存
+            //return Meta.SingleCache.GetItemWithSlaveKey(username) as TEntity;
+
+            return Find(_.NormalizedUserName == normalizedUserName);
+        }
+
         /// <summary>根据邮件查找</summary>
         /// <param name="email">邮件</param>
         /// <returns>实体列表</returns>
@@ -187,6 +201,17 @@ namespace Extensions.Identity.Stores.XCode
             if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.PhoneNumber == phonenumber);
 
             return FindAll(_.PhoneNumber == phonenumber);
+        }
+
+        /// <summary>根据id列表查找</summary>
+        /// <param name="ids"></param>
+        /// <returns>实体列表</returns>
+        public static IList<TEntity> FindAllByIds(List<int> ids)
+        {
+            // 实体缓存
+            if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => ids.Contains(e.Id));
+
+            return FindAll(_.Id.In(ids));
         }
         #endregion
 

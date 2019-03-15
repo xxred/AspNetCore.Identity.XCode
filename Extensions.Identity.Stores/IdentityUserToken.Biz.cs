@@ -141,6 +141,19 @@ namespace Extensions.Identity.Stores.XCode
 
             return FindAll(_.UserId == userid & _.LoginProvider == loginprovider & _.Name == name);
         }
+
+        /// <summary>根据用户编号、登录提供者、token名查找</summary>
+        /// <param name="userid">用户编号</param>
+        /// <param name="loginprovider">登录提供者</param>
+        /// <param name="name">token名</param>
+        /// <returns>实体</returns>
+        public static TEntity FindByUserIdAndLoginProviderAndName(Int32 userid, String loginprovider, String name)
+        {
+            // 实体缓存
+            if (Meta.Session.Count < 1000) return Meta.Cache.Find(e => e.UserId == userid && e.LoginProvider == loginprovider && e.Name == name);
+
+            return Find(_.UserId == userid & _.LoginProvider == loginprovider & _.Name == name);
+        }
         #endregion
 
         #region 高级查询
