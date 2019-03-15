@@ -8,102 +8,59 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+using Extensions.Identity.Stores.XCode;
+using Microsoft.AspNetCore.Identity;
+using XCode;
 
-namespace Microsoft.AspNetCore.Identity.EntityFrameworkCore
+namespace AspNetCore.Identity.XCode
 {
     /// <summary>
     /// Creates a new instance of a persistence store for roles.
     /// </summary>
-    /// <typeparam name="TRole">The type of the class representing a role</typeparam>
-    public class RoleStore<TRole> : RoleStore<TRole, DbContext, string>
-        where TRole : IdentityRole<string>
+    /// <typeparam name="TRole">The type of the class representing a role.</typeparam>
+    public class RoleStore<TRole> : RoleStore<TRole, IdentityUserRole, IdentityRoleClaim>,
+        IQueryableRoleStore<TRole>,
+        IRoleClaimStore<TRole>
+        where TRole : IdentityRole<TRole>, new()
+
+
     {
         /// <summary>
         /// Constructs a new instance of <see cref="RoleStore{TRole}"/>.
         /// </summary>
-        /// <param name="context">The <see cref="DbContext"/>.</param>
         /// <param name="describer">The <see cref="IdentityErrorDescriber"/>.</param>
-        public RoleStore(DbContext context, IdentityErrorDescriber describer = null) : base(context, describer) { }
+        public RoleStore(IdentityErrorDescriber describer = null) : base(describer) { }
     }
 
     /// <summary>
     /// Creates a new instance of a persistence store for roles.
     /// </summary>
     /// <typeparam name="TRole">The type of the class representing a role.</typeparam>
-    /// <typeparam name="TContext">The type of the data context class used to access the store.</typeparam>
-    public class RoleStore<TRole, TContext> : RoleStore<TRole, TContext, string>
-        where TRole : IdentityRole<string>
-        where TContext : DbContext
-    {
-        /// <summary>
-        /// Constructs a new instance of <see cref="RoleStore{TRole, TContext}"/>.
-        /// </summary>
-        /// <param name="context">The <see cref="DbContext"/>.</param>
-        /// <param name="describer">The <see cref="IdentityErrorDescriber"/>.</param>
-        public RoleStore(TContext context, IdentityErrorDescriber describer = null) : base(context, describer) { }
-    }
-
-    /// <summary>
-    /// Creates a new instance of a persistence store for roles.
-    /// </summary>
-    /// <typeparam name="TRole">The type of the class representing a role.</typeparam>
-    /// <typeparam name="TContext">The type of the data context class used to access the store.</typeparam>
-    /// <typeparam name="TKey">The type of the primary key for a role.</typeparam>
-    public class RoleStore<TRole, TContext, TKey> : RoleStore<TRole, TContext, TKey, IdentityUserRole<TKey>, IdentityRoleClaim<TKey>>,
-        IQueryableRoleStore<TRole>,
-        IRoleClaimStore<TRole>
-        where TRole : IdentityRole<TKey>
-        where TKey : IEquatable<TKey>
-        where TContext : DbContext
-    {
-        /// <summary>
-        /// Constructs a new instance of <see cref="RoleStore{TRole, TContext, TKey}"/>.
-        /// </summary>
-        /// <param name="context">The <see cref="DbContext"/>.</param>
-        /// <param name="describer">The <see cref="IdentityErrorDescriber"/>.</param>
-        public RoleStore(TContext context, IdentityErrorDescriber describer = null) : base(context, describer) { }
-    }
-
-    /// <summary>
-    /// Creates a new instance of a persistence store for roles.
-    /// </summary>
-    /// <typeparam name="TRole">The type of the class representing a role.</typeparam>
-    /// <typeparam name="TContext">The type of the data context class used to access the store.</typeparam>
-    /// <typeparam name="TKey">The type of the primary key for a role.</typeparam>
     /// <typeparam name="TUserRole">The type of the class representing a user role.</typeparam>
     /// <typeparam name="TRoleClaim">The type of the class representing a role claim.</typeparam>
-    public class RoleStore<TRole, TContext, TKey, TUserRole, TRoleClaim> :
+    public class RoleStore<TRole, TUserRole, TRoleClaim> :
         IQueryableRoleStore<TRole>,
         IRoleClaimStore<TRole>
-        where TRole : IdentityRole<TKey>
-        where TKey : IEquatable<TKey>
-        where TContext : DbContext
-        where TUserRole : IdentityUserRole<TKey>, new()
-        where TRoleClaim : IdentityRoleClaim<TKey>, new()
+        where TRole : IdentityRole<TRole>, new()
+        where TUserRole : IdentityUserRole<TUserRole>, new()
+        where TRoleClaim : IdentityRoleClaim<TRoleClaim>, new()
     {
         /// <summary>
-        /// Constructs a new instance of <see cref="RoleStore{TRole, TContext, TKey, TUserRole, TRoleClaim}"/>.
+        /// Constructs a new instance of <see cref="RoleStore{TRole, TUserRole, TRoleClaim}"/>.
         /// </summary>
-        /// <param name="context">The <see cref="DbContext"/>.</param>
         /// <param name="describer">The <see cref="IdentityErrorDescriber"/>.</param>
-        public RoleStore(TContext context, IdentityErrorDescriber describer = null)
+        public RoleStore(IdentityErrorDescriber describer = null)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-            Context = context;
             ErrorDescriber = describer ?? new IdentityErrorDescriber();
         }
 
         private bool _disposed;
 
 
-        /// <summary>
-        /// Gets the database context for this store.
-        /// </summary>
-        public TContext Context { get; private set; }
+        ///// <summary>
+        ///// Gets the database context for this store.
+        ///// </summary>
+        //public TContext Context { get; private set; }
 
         /// <summary>
         /// Gets or sets the <see cref="IdentityErrorDescriber"/> for any error that occurred with the current operation.
@@ -118,24 +75,13 @@ namespace Microsoft.AspNetCore.Identity.EntityFrameworkCore
         /// </value>
         public bool AutoSaveChanges { get; set; } = true;
 
-        /// <summary>Saves the current store.</summary>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
-        /// <returns>The <see cref="Task"/> that represents the asynchronous operation.</returns>
-        private async Task SaveChanges(CancellationToken cancellationToken)
-        {
-            if (AutoSaveChanges)
-            {
-                await Context.SaveChangesAsync(cancellationToken);
-            }
-        }
-
         /// <summary>
         /// Creates a new role in a store as an asynchronous operation.
         /// </summary>
         /// <param name="role">The role to create in the store.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>A <see cref="Task{TResult}"/> that represents the <see cref="IdentityResult"/> of the asynchronous query.</returns>
-        public async virtual Task<IdentityResult> CreateAsync(TRole role, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task<IdentityResult> CreateAsync(TRole role, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -143,9 +89,9 @@ namespace Microsoft.AspNetCore.Identity.EntityFrameworkCore
             {
                 throw new ArgumentNullException(nameof(role));
             }
-            Context.Add(role);
-            await SaveChanges(cancellationToken);
-            return IdentityResult.Success;
+
+            role.Save();
+            return Task.FromResult(IdentityResult.Success);
         }
 
         /// <summary>
@@ -154,7 +100,7 @@ namespace Microsoft.AspNetCore.Identity.EntityFrameworkCore
         /// <param name="role">The role to update in the store.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>A <see cref="Task{TResult}"/> that represents the <see cref="IdentityResult"/> of the asynchronous query.</returns>
-        public async virtual Task<IdentityResult> UpdateAsync(TRole role, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task<IdentityResult> UpdateAsync(TRole role, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -162,18 +108,18 @@ namespace Microsoft.AspNetCore.Identity.EntityFrameworkCore
             {
                 throw new ArgumentNullException(nameof(role));
             }
-            Context.Attach(role);
+
             role.ConcurrencyStamp = Guid.NewGuid().ToString();
-            Context.Update(role);
             try
             {
-                await SaveChanges(cancellationToken);
+                role.Save();
+
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception)
             {
-                return IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure());
+                return Task.FromResult(IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure()));
             }
-            return IdentityResult.Success;
+            return Task.FromResult(IdentityResult.Success);
         }
 
         /// <summary>
@@ -182,7 +128,7 @@ namespace Microsoft.AspNetCore.Identity.EntityFrameworkCore
         /// <param name="role">The role to delete from the store.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>A <see cref="Task{TResult}"/> that represents the <see cref="IdentityResult"/> of the asynchronous query.</returns>
-        public async virtual Task<IdentityResult> DeleteAsync(TRole role, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task<IdentityResult> DeleteAsync(TRole role, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -190,16 +136,16 @@ namespace Microsoft.AspNetCore.Identity.EntityFrameworkCore
             {
                 throw new ArgumentNullException(nameof(role));
             }
-            Context.Remove(role);
+
             try
             {
-                await SaveChanges(cancellationToken);
+                role.Delete();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception)
             {
-                return IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure());
+                return Task.FromResult(IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure()));
             }
-            return IdentityResult.Success;
+            return Task.FromResult(IdentityResult.Success);
         }
 
         /// <summary>
@@ -216,7 +162,7 @@ namespace Microsoft.AspNetCore.Identity.EntityFrameworkCore
             {
                 throw new ArgumentNullException(nameof(role));
             }
-            return Task.FromResult(ConvertIdToString(role.Id));
+            return Task.FromResult(role.Id.ToString());
         }
 
         /// <summary>
@@ -256,34 +202,6 @@ namespace Microsoft.AspNetCore.Identity.EntityFrameworkCore
         }
 
         /// <summary>
-        /// Converts the provided <paramref name="id"/> to a strongly typed key object.
-        /// </summary>
-        /// <param name="id">The id to convert.</param>
-        /// <returns>An instance of <typeparamref name="TKey"/> representing the provided <paramref name="id"/>.</returns>
-        public virtual TKey ConvertIdFromString(string id)
-        {
-            if (id == null)
-            {
-                return default(TKey);
-            }
-            return (TKey)TypeDescriptor.GetConverter(typeof(TKey)).ConvertFromInvariantString(id);
-        }
-
-        /// <summary>
-        /// Converts the provided <paramref name="id"/> to its string representation.
-        /// </summary>
-        /// <param name="id">The id to convert.</param>
-        /// <returns>An <see cref="string"/> representation of the provided <paramref name="id"/>.</returns>
-        public virtual string ConvertIdToString(TKey id)
-        {
-            if (id.Equals(default(TKey)))
-            {
-                return null;
-            }
-            return id.ToString();
-        }
-
-        /// <summary>
         /// Finds the role who has the specified ID as an asynchronous operation.
         /// </summary>
         /// <param name="id">The role ID to look for.</param>
@@ -293,8 +211,8 @@ namespace Microsoft.AspNetCore.Identity.EntityFrameworkCore
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
-            var roleId = ConvertIdFromString(id);
-            return Roles.FirstOrDefaultAsync(u => u.Id.Equals(roleId), cancellationToken);
+            var roles = IdentityRole<TRole>.FindById(id.ToInt());
+            return Task.FromResult(roles);
         }
 
         /// <summary>
@@ -307,7 +225,8 @@ namespace Microsoft.AspNetCore.Identity.EntityFrameworkCore
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
-            return Roles.FirstOrDefaultAsync(r => r.NormalizedName == normalizedName, cancellationToken);
+            var roles = IdentityRole<TRole>.FindByNormalizedName(normalizedName);
+            return Task.FromResult(roles);
         }
 
         /// <summary>
@@ -368,7 +287,7 @@ namespace Microsoft.AspNetCore.Identity.EntityFrameworkCore
         /// <param name="role">The role whose claims should be retrieved.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>A <see cref="Task{TResult}"/> that contains the claims granted to a role.</returns>
-        public async virtual Task<IList<Claim>> GetClaimsAsync(TRole role, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task<IList<Claim>> GetClaimsAsync(TRole role, CancellationToken cancellationToken = default(CancellationToken))
         {
             ThrowIfDisposed();
             if (role == null)
@@ -376,7 +295,9 @@ namespace Microsoft.AspNetCore.Identity.EntityFrameworkCore
                 throw new ArgumentNullException(nameof(role));
             }
 
-            return await RoleClaims.Where(rc => rc.RoleId.Equals(role.Id)).Select(c => new Claim(c.ClaimType, c.ClaimValue)).ToListAsync(cancellationToken);
+            var roleClaims = IdentityRoleClaim<TRoleClaim>.FindAllByRoleId(role.Id);
+            var claims = roleClaims.Select(c => new Claim(c.ClaimType, c.ClaimValue)).ToList();
+            return Task.FromResult((IList<Claim>)claims);
         }
 
         /// <summary>
@@ -398,7 +319,7 @@ namespace Microsoft.AspNetCore.Identity.EntityFrameworkCore
                 throw new ArgumentNullException(nameof(claim));
             }
 
-            RoleClaims.Add(CreateRoleClaim(role, claim));
+            CreateRoleClaim(role, claim).Save();
             return Task.FromResult(false);
         }
 
@@ -409,7 +330,7 @@ namespace Microsoft.AspNetCore.Identity.EntityFrameworkCore
         /// <param name="claim">The claim to remove from the role.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>The <see cref="Task"/> that represents the asynchronous operation.</returns>
-        public async virtual Task RemoveClaimAsync(TRole role, Claim claim, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task RemoveClaimAsync(TRole role, Claim claim, CancellationToken cancellationToken = default(CancellationToken))
         {
             ThrowIfDisposed();
             if (role == null)
@@ -420,19 +341,16 @@ namespace Microsoft.AspNetCore.Identity.EntityFrameworkCore
             {
                 throw new ArgumentNullException(nameof(claim));
             }
-            var claims = await RoleClaims.Where(rc => rc.RoleId.Equals(role.Id) && rc.ClaimValue == claim.Value && rc.ClaimType == claim.Type).ToListAsync(cancellationToken);
-            foreach (var c in claims)
-            {
-                RoleClaims.Remove(c);
-            }
+            var claims = IdentityRoleClaim<TRoleClaim>.FindAllByRoleIdAndTypeAndValue(role.Id, claim.Value, claim.Type).ToList();
+            claims.Delete();
+
+            return Task.CompletedTask;
         }
 
         /// <summary>
         /// A navigation property for the roles the store contains.
         /// </summary>
-        public virtual IQueryable<TRole> Roles => Context.Set<TRole>();
-
-        private DbSet<TRoleClaim> RoleClaims { get { return Context.Set<TRoleClaim>(); } }
+        public virtual IQueryable<TRole> Roles => IdentityRole<TRole>.Meta.Cache.Entities.AsQueryable();
 
         /// <summary>
         /// Creates an entity representing a role claim.

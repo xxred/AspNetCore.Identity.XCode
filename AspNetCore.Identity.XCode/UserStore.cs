@@ -450,7 +450,7 @@ namespace AspNetCore.Identity.XCode
                 throw new ArgumentNullException(nameof(newClaim));
             }
 
-            var matchedClaims = IdentityUserClaim<TUserClaim>.FindAllByUserIdAndTypeAndValue(user.Id, claim.Value, claim.Type);
+            var matchedClaims = IdentityUserClaim<TUserClaim>.FindAllByUserIdAndTypeAndValue(user.Id, claim.Type, claim.Value);
 
             foreach (var matchedClaim in matchedClaims)
             {
@@ -479,7 +479,7 @@ namespace AspNetCore.Identity.XCode
             }
             foreach (var claim in claims)
             {
-                var matchedClaims = IdentityUserClaim<TUserClaim>.FindAllByUserIdAndTypeAndValue(user.Id, claim.Value, claim.Type);
+                var matchedClaims = IdentityUserClaim<TUserClaim>.FindAllByUserIdAndTypeAndValue(user.Id, claim.Type, claim.Value);
                 matchedClaims.Delete();
             }
         }

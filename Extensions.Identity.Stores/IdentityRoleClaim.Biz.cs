@@ -142,6 +142,31 @@ namespace Extensions.Identity.Stores.XCode
 
             return FindAll(_.RoleId == roleid);
         }
+
+        /// <summary>根据角色编号、声明类型和值查找</summary>
+        /// <param name="roleid">角色编号</param>
+        /// <param name="type"></param>
+        /// <param name="value"></param>
+        /// <returns>实体列表</returns>
+        public static IList<TEntity> FindAllByRoleIdAndTypeAndValue(Int32 roleid, String value, String type)
+        {
+            // 实体缓存
+            if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.RoleId == roleid && e.ClaimType == type && e.ClaimValue == value);
+
+            return FindAll(_.RoleId == roleid & _.ClaimType == type & _.ClaimValue == value);
+        }
+
+        /// <summary>根据声明类型和值查找</summary>
+        /// <param name="type"></param>
+        /// <param name="value"></param>
+        /// <returns>实体列表</returns>
+        public static IList<TEntity> FindAllByTypeAndValue(String type, String value)
+        {
+            // 实体缓存
+            if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.ClaimType == type && e.ClaimValue == value);
+
+            return FindAll(_.ClaimType == type & _.ClaimValue == value);
+        }
         #endregion
 
         #region 高级查询

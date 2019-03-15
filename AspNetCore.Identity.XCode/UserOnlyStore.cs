@@ -7,9 +7,9 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
-namespace Microsoft.AspNetCore.Identity.EntityFrameworkCore
+namespace AspNetCore.Identity.XCode
 {
     /// <summary>
     /// Creates a new instance of a persistence store for the specified user type.

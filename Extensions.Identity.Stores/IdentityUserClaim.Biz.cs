@@ -143,7 +143,7 @@ namespace Extensions.Identity.Stores.XCode
             return FindAll(_.UserId == userid);
         }
 
-        /// <summary>根据用户编号查找</summary>
+        /// <summary>根据用户编号、声明类型和值查找</summary>
         /// <param name="userid">用户编号</param>
         /// <param name="type"></param>
         /// <param name="value"></param>
@@ -156,11 +156,11 @@ namespace Extensions.Identity.Stores.XCode
             return FindAll(_.UserId == userid & _.ClaimType == type & _.ClaimValue == value);
         }
 
-        /// <summary>根据用户编号查找</summary>
+        /// <summary>根据声明类型和值查找</summary>
         /// <param name="type"></param>
         /// <param name="value"></param>
         /// <returns>实体列表</returns>
-        public static IList<TEntity> FindAllByTypeAndValue(String value, String type)
+        public static IList<TEntity> FindAllByTypeAndValue(String type, String value)
         {
             // 实体缓存
             if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.ClaimType == type && e.ClaimValue == value);
