@@ -83,39 +83,13 @@ namespace AspNetCore.Identity.XCode
         {
         }
 
-        private List<EntityBase> Context = new List<EntityBase>();
-
-        //private DbSet<TUser> UsersSet { get { return Context.Set<TUser>(); } }
-        //private DbSet<TRole> Roles { get { return Context.Set<TRole>(); } }
-        //private DbSet<TUserClaim> UserClaims { get { return Context.Set<TUserClaim>(); } }
-        //private DbSet<TUserRole> UserRoles { get { return Context.Set<TUserRole>(); } }
-        //private DbSet<TUserLogin> UserLogins { get { return Context.Set<TUserLogin>(); } }
-        //private DbSet<TUserToken> UserTokens { get { return Context.Set<TUserToken>(); } }
-
-        /// <summary>
-        /// Gets or sets a flag indicating if changes should be persisted after CreateAsync, UpdateAsync and DeleteAsync are called.
-        /// </summary>
-        /// <value>
-        /// True if changes should be automatically persisted, otherwise false.
-        /// </value>
-        public bool AutoSaveChanges { get; set; } = true;
-
-        /// <summary>Saves the current store.</summary>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
-        /// <returns>The <see cref="Task"/> that represents the asynchronous operation.</returns>
-        protected Task SaveChanges(CancellationToken cancellationToken)
-        {
-            Context.Save();
-            return Task.CompletedTask;
-        }
-
         /// <summary>
         /// Creates the specified <paramref name="user"/> in the user store.
         /// </summary>
         /// <param name="user">The user to create.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/> of the creation operation.</returns>
-        public override async Task<IdentityResult> CreateAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        public override Task<IdentityResult> CreateAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -123,9 +97,9 @@ namespace AspNetCore.Identity.XCode
             {
                 throw new ArgumentNullException(nameof(user));
             }
-            Context.Add(user);
-            await SaveChanges(cancellationToken);
-            return IdentityResult.Success;
+            user.Save();
+            
+            return Task.FromResult(IdentityResult.Success);
         }
 
         /// <summary>
@@ -134,7 +108,7 @@ namespace AspNetCore.Identity.XCode
         /// <param name="user">The user to update.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/> of the update operation.</returns>
-        public override async Task<IdentityResult> UpdateAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        public override Task<IdentityResult> UpdateAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -143,18 +117,18 @@ namespace AspNetCore.Identity.XCode
                 throw new ArgumentNullException(nameof(user));
             }
 
-            Context.Add(user);
             user.ConcurrencyStamp = Guid.NewGuid().ToString();
 
             try
             {
-                await SaveChanges(cancellationToken);
+                user.Save();
             }
             catch (Exception)
             {
-                return IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure());
+                
+                return Task.FromResult(IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure()));
             }
-            return IdentityResult.Success;
+            return Task.FromResult(IdentityResult.Success);
         }
 
         /// <summary>
@@ -163,7 +137,7 @@ namespace AspNetCore.Identity.XCode
         /// <param name="user">The user to delete.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/> of the update operation.</returns>
-        public override async Task<IdentityResult> DeleteAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
+        public override Task<IdentityResult> DeleteAsync(TUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -172,16 +146,16 @@ namespace AspNetCore.Identity.XCode
                 throw new ArgumentNullException(nameof(user));
             }
 
-            Context.Remove(user);
             try
             {
-                await SaveChanges(cancellationToken);
+                user.Save();
             }
             catch (Exception)
             {
-                return IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure());
+
+                return Task.FromResult(IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure()));
             }
-            return IdentityResult.Success;
+            return Task.FromResult(IdentityResult.Success);
         }
 
         /// <summary>
@@ -211,7 +185,7 @@ namespace AspNetCore.Identity.XCode
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
-            return Task.FromResult(IdentityUser<TUser>.FindByUserName(normalizedUserName));
+            return Task.FromResult(IdentityUser<TUser>.FindByNormalizedUserName(normalizedUserName));
         }
 
         /// <summary>
@@ -586,7 +560,7 @@ namespace AspNetCore.Identity.XCode
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
-            return Task.FromResult(IdentityUser<TUser>.FindByNormalizedUserName(normalizedEmail));
+            return Task.FromResult(IdentityUser<TUser>.FindByNormalizedEmail(normalizedEmail));
         }
 
         /// <summary>

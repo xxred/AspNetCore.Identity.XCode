@@ -192,6 +192,17 @@ namespace Extensions.Identity.Stores.XCode
             return FindAll(_.Email == email);
         }
 
+        /// <summary>根据邮件查找</summary>
+        /// <param name="normalizedEmail">邮件</param>
+        /// <returns>实体列表</returns>
+        public static TEntity FindByNormalizedEmail(String normalizedEmail)
+        {
+            // 实体缓存
+            if (Meta.Session.Count < 1000) return Meta.Cache.Find(e => e.NormalizedEmail == normalizedEmail);
+
+            return Find(_.Email == normalizedEmail);
+        }
+
         /// <summary>根据手机号查找</summary>
         /// <param name="phonenumber">手机号</param>
         /// <returns>实体列表</returns>
