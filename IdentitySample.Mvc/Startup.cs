@@ -39,6 +39,7 @@ namespace IdentitySample.Mvc
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            // Identity配置
             services.AddIdentityCore<IdentityUser>()
                 .AddRoles<IdentityRole>()
                 .AddXCodeStores()
