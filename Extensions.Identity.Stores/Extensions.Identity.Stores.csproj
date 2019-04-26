@@ -4,6 +4,10 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Extensions.Identity.Stores.XCode</RootNamespace>
     <AssemblyName>Extensions.Identity.Stores.XCode</AssemblyName>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AssemblyVersion>1.2019.3.16</AssemblyVersion>
+    <FileVersion>1.2019.3.16</FileVersion>
+    <Version>1.2019.3.16</Version>
   </PropertyGroup>
 
   <ItemGroup>
