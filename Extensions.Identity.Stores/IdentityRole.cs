@@ -33,11 +33,11 @@ namespace Extensions.Identity.Stores.XCode
         public String Name { get { return _Name; } set { if (OnPropertyChanging(__.Name, value)) { _Name = value; OnPropertyChanged(__.Name); } } }
 
         private String _NormalizedName;
-        /// <summary>名称</summary>
-        [DisplayName("名称")]
-        [Description("名称")]
+        /// <summary>标准化名称</summary>
+        [DisplayName("标准化名称")]
+        [Description("标准化名称")]
         [DataObjectField(false, false, false, 50)]
-        [BindColumn("NormalizedName", "名称", "", Master = true)]
+        [BindColumn("NormalizedName", "标准化名称", "", Master = true)]
         public String NormalizedName { get { return _NormalizedName; } set { if (OnPropertyChanging(__.NormalizedName, value)) { _NormalizedName = value; OnPropertyChanged(__.NormalizedName); } } }
 
         private String _ConcurrencyStamp;
@@ -55,6 +55,14 @@ namespace Extensions.Identity.Stores.XCode
         [DataObjectField(false, false, false, 0)]
         [BindColumn("IsSystem", "系统。用于业务系统开发使用，不受数据权限约束，禁止修改名称或删除", "")]
         public Boolean IsSystem { get { return _IsSystem; } set { if (OnPropertyChanging(__.IsSystem, value)) { _IsSystem = value; OnPropertyChanged(__.IsSystem); } } }
+
+        private Boolean _Enable;
+        /// <summary>是否启用</summary>
+        [DisplayName("是否启用")]
+        [Description("是否启用")]
+        [DataObjectField(false, false, false, 0)]
+        [BindColumn("Enable", "是否启用", "")]
+        public Boolean Enable { get { return _Enable; } set { if (OnPropertyChanging(__.Enable, value)) { _Enable = value; OnPropertyChanged(__.Enable); } } }
 
         private String _Remark;
         /// <summary>说明</summary>
@@ -128,6 +136,7 @@ namespace Extensions.Identity.Stores.XCode
                     case __.NormalizedName : return _NormalizedName;
                     case __.ConcurrencyStamp : return _ConcurrencyStamp;
                     case __.IsSystem : return _IsSystem;
+                    case __.Enable : return _Enable;
                     case __.Remark : return _Remark;
                     case __.CreateUserID : return _CreateUserID;
                     case __.CreateIP : return _CreateIP;
@@ -147,6 +156,7 @@ namespace Extensions.Identity.Stores.XCode
                     case __.NormalizedName : _NormalizedName = Convert.ToString(value); break;
                     case __.ConcurrencyStamp : _ConcurrencyStamp = Convert.ToString(value); break;
                     case __.IsSystem : _IsSystem = value.ToBoolean(); break;
+                    case __.Enable : _Enable = value.ToBoolean(); break;
                     case __.Remark : _Remark = Convert.ToString(value); break;
                     case __.CreateUserID : _CreateUserID = value.ToInt(); break;
                     case __.CreateIP : _CreateIP = Convert.ToString(value); break;
@@ -170,7 +180,7 @@ namespace Extensions.Identity.Stores.XCode
             /// <summary>名称</summary>
             public static readonly Field Name = FindByName(__.Name);
 
-            /// <summary>名称</summary>
+            /// <summary>标准化名称</summary>
             public static readonly Field NormalizedName = FindByName(__.NormalizedName);
 
             /// <summary>存储随机值(当用户被持久化到存储时必须更改的随机值)</summary>
@@ -178,6 +188,9 @@ namespace Extensions.Identity.Stores.XCode
 
             /// <summary>系统。用于业务系统开发使用，不受数据权限约束，禁止修改名称或删除</summary>
             public static readonly Field IsSystem = FindByName(__.IsSystem);
+
+            /// <summary>是否启用</summary>
+            public static readonly Field Enable = FindByName(__.Enable);
 
             /// <summary>说明</summary>
             public static readonly Field Remark = FindByName(__.Remark);
@@ -212,7 +225,7 @@ namespace Extensions.Identity.Stores.XCode
             /// <summary>名称</summary>
             public const String Name = "Name";
 
-            /// <summary>名称</summary>
+            /// <summary>标准化名称</summary>
             public const String NormalizedName = "NormalizedName";
 
             /// <summary>存储随机值(当用户被持久化到存储时必须更改的随机值)</summary>
@@ -220,6 +233,9 @@ namespace Extensions.Identity.Stores.XCode
 
             /// <summary>系统。用于业务系统开发使用，不受数据权限约束，禁止修改名称或删除</summary>
             public const String IsSystem = "IsSystem";
+
+            /// <summary>是否启用</summary>
+            public const String Enable = "Enable";
 
             /// <summary>说明</summary>
             public const String Remark = "Remark";
@@ -255,7 +271,7 @@ namespace Extensions.Identity.Stores.XCode
         /// <summary>名称</summary>
         String Name { get; set; }
 
-        /// <summary>名称</summary>
+        /// <summary>标准化名称</summary>
         String NormalizedName { get; set; }
 
         /// <summary>存储随机值(当用户被持久化到存储时必须更改的随机值)</summary>
@@ -263,6 +279,9 @@ namespace Extensions.Identity.Stores.XCode
 
         /// <summary>系统。用于业务系统开发使用，不受数据权限约束，禁止修改名称或删除</summary>
         Boolean IsSystem { get; set; }
+
+        /// <summary>是否启用</summary>
+        Boolean Enable { get; set; }
 
         /// <summary>说明</summary>
         String Remark { get; set; }

@@ -66,45 +66,46 @@ namespace Extensions.Identity.Stores.XCode
             // CheckExist(isNew, __.UserName);
         }
 
-        ///// <summary>首次连接数据库时初始化数据，仅用于实体类重载，用户不应该调用该方法</summary>
-        //[EditorBrowsable(EditorBrowsableState.Never)]
-        //protected override void InitData()
-        //{
-        //    // InitData一般用于当数据表没有数据时添加一些默认数据，该实体类的任何第一次数据库操作都会触发该方法，默认异步调用
-        //    if (Meta.Session.Count > 0) return;
+        /// <summary>首次连接数据库时初始化数据，仅用于实体类重载，用户不应该调用该方法</summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        protected override void InitData()
+        {
+            // InitData一般用于当数据表没有数据时添加一些默认数据，该实体类的任何第一次数据库操作都会触发该方法，默认异步调用
+            if (Meta.Session.Count > 0) return;
 
-        //    if (XTrace.Debug) XTrace.WriteLine("开始初始化TEntity[IdentityUser]数据……");
+            if (XTrace.Debug) XTrace.WriteLine("开始初始化TEntity[IdentityUser]数据……");
 
-        //    var entity = new TEntity();
-        //    entity.Id = 0;
-        //    entity.UserName = "abc";
-        //    entity.NormalizedUserName = "abc";
-        //    entity.Email = "abc";
-        //    entity.NormalizedEmail = "abc";
-        //    entity.EmailConfirmed = true;
-        //    entity.PasswordHash = "abc";
-        //    entity.SecurityStamp = "abc";
-        //    entity.ConcurrencyStamp = "abc";
-        //    entity.PhoneNumber = "abc";
-        //    entity.PhoneNumberConfirmed = true;
-        //    entity.TwoFactorEnabled = true;
-        //    entity.LockoutEnd = DateTime.Now;
-        //    entity.LockoutEnabled = true;
-        //    entity.AccessFailedCount = 0;
-        //    entity.Sex = 0;
-        //    entity.Code = "abc";
-        //    entity.Avatar = "abc";
-        //    entity.Online = true;
-        //    entity.Enable = true;
-        //    entity.Logins = 0;
-        //    entity.LastLogin = DateTime.Now;
-        //    entity.LastLoginIP = "abc";
-        //    entity.RegisterTime = DateTime.Now;
-        //    entity.RegisterIP = "abc";
-        //    entity.Insert();
+            var entity = new TEntity();
+            entity.Id = 1;
+            entity.UserName = "admin";
+            entity.NormalizedUserName = "ADMIN";
+            entity.Email = "admin@qq.com";
+            entity.NormalizedEmail = "ADMIN@QQ.COM";
+            entity.EmailConfirmed = true;
+            // 密码 Aa-123456
+            entity.PasswordHash = "	AQAAAAEAACcQAAAAEHEeTdNCE8pS77sAi1ZC0Ql7eUKnn7R/wEGZES5vCuIBrGDb1/tduS3dzzAyO5jGDg==";
+            entity.SecurityStamp = "6PU3ZXMP454LYGTOTFUIG2LJD3INAWVB";
+            entity.ConcurrencyStamp = null;
+            entity.PhoneNumber = "12345678910";
+            entity.PhoneNumberConfirmed = true;
+            entity.TwoFactorEnabled = false;
+            entity.LockoutEnd = DateTime.Now;
+            entity.LockoutEnabled = false;
+            entity.AccessFailedCount = 0;
+            entity.Sex = -1;
+            entity.Code = null;
+            entity.Avatar = null;
+            entity.Online = true;
+            entity.Enable = true;
+            entity.Logins = 0;
+            entity.LastLogin = DateTime.Now;
+            entity.LastLoginIP = null;
+            entity.RegisterTime = DateTime.Now;
+            entity.RegisterIP = null;
+            entity.Insert();
 
-        //    if (XTrace.Debug) XTrace.WriteLine("完成初始化TEntity[IdentityUser]数据！");
-        //}
+            if (XTrace.Debug) XTrace.WriteLine("完成初始化TEntity[IdentityUser]数据！");
+        }
 
         ///// <summary>已重载。基类先调用Valid(true)验证数据，然后在事务保护内调用OnInsert</summary>
         ///// <returns></returns>

@@ -80,32 +80,32 @@ namespace Extensions.Identity.Stores.XCode
             // CheckExist(isNew, __.Name);
         }
 
-        ///// <summary>首次连接数据库时初始化数据，仅用于实体类重载，用户不应该调用该方法</summary>
-        //[EditorBrowsable(EditorBrowsableState.Never)]
-        //protected override void InitData()
-        //{
-        //    // InitData一般用于当数据表没有数据时添加一些默认数据，该实体类的任何第一次数据库操作都会触发该方法，默认异步调用
-        //    if (Meta.Session.Count > 0) return;
+        /// <summary>首次连接数据库时初始化数据，仅用于实体类重载，用户不应该调用该方法</summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        protected override void InitData()
+        {
+            // InitData一般用于当数据表没有数据时添加一些默认数据，该实体类的任何第一次数据库操作都会触发该方法，默认异步调用
+            if (Meta.Session.Count > 0) return;
 
-        //    if (XTrace.Debug) XTrace.WriteLine("开始初始化TEntity[IdentityRole]数据……");
+            if (XTrace.Debug) XTrace.WriteLine("开始初始化TEntity[IdentityRole]数据……");
 
-        //    var entity = new TEntity();
-        //    entity.Id = 0;
-        //    entity.Name = "abc";
-        //    entity.NormalizedName = "abc";
-        //    entity.ConcurrencyStamp = "abc";
-        //    entity.IsSystem = true;
-        //    entity.Remark = "abc";
-        //    entity.CreateUserID = 0;
-        //    entity.CreateIP = "abc";
-        //    entity.CreateTime = DateTime.Now;
-        //    entity.UpdateUserID = 0;
-        //    entity.UpdateIP = "abc";
-        //    entity.UpdateTime = DateTime.Now;
-        //    entity.Insert();
+            var entity = new TEntity();
+            entity.Id = 1;
+            entity.Name = "admin";
+            entity.NormalizedName = "ADMIN";
+            entity.ConcurrencyStamp = null;
+            entity.IsSystem = true;
+            entity.Remark = null;
+            entity.CreateUserID = 0;
+            entity.CreateIP = null;
+            entity.CreateTime = DateTime.Now;
+            entity.UpdateUserID = 0;
+            entity.UpdateIP = null;
+            entity.UpdateTime = DateTime.Now;
+            entity.Insert();
 
-        //    if (XTrace.Debug) XTrace.WriteLine("完成初始化TEntity[IdentityRole]数据！");
-        //}
+            if (XTrace.Debug) XTrace.WriteLine("完成初始化TEntity[IdentityRole]数据！");
+        }
 
         ///// <summary>已重载。基类先调用Valid(true)验证数据，然后在事务保护内调用OnInsert</summary>
         ///// <returns></returns>
