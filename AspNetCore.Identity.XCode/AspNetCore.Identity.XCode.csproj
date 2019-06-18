@@ -3,9 +3,9 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyVersion>1.2019.3.16</AssemblyVersion>
-    <FileVersion>1.2019.3.16</FileVersion>
-    <Version>1.2019.3.16</Version>
+    <AssemblyVersion>1.2019.6.18</AssemblyVersion>
+    <FileVersion>1.2019.6.18</FileVersion>
+    <Version>1.2019.6.18</Version>
   </PropertyGroup>
 
   <ItemGroup>
