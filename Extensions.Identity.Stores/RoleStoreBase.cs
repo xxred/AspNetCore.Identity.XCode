@@ -16,7 +16,6 @@ namespace Extensions.Identity.Stores.XCode
     /// Creates a new instance of a persistence store for roles.
     /// </summary>
     /// <typeparam name="TRole">The type of the class representing a role.</typeparam>
-    /// <typeparam name="TKey">The type of the primary key for a role.</typeparam>
     /// <typeparam name="TUserRole">The type of the class representing a user role.</typeparam>
     /// <typeparam name="TRoleClaim">The type of the class representing a role claim.</typeparam>
     public abstract class RoleStoreBase<TRole, TUserRole, TRoleClaim> :
@@ -32,12 +31,7 @@ namespace Extensions.Identity.Stores.XCode
         /// <param name="describer">The <see cref="IdentityErrorDescriber"/>.</param>
         public RoleStoreBase(IdentityErrorDescriber describer)
         {
-            if (describer == null)
-            {
-                throw new ArgumentNullException(nameof(describer));
-            }
-
-            ErrorDescriber = describer;
+            ErrorDescriber = describer ?? throw new ArgumentNullException(nameof(describer));
         }
 
         private bool _disposed;
@@ -128,14 +122,14 @@ namespace Extensions.Identity.Stores.XCode
         /// Converts the provided <paramref name="id"/> to a strongly typed key object.
         /// </summary>
         /// <param name="id">The id to convert.</param>
-        /// <returns>An instance of <typeparamref name="TKey"/> representing the provided <paramref name="id"/>.</returns>
         public virtual int ConvertIdFromString(string id)
         {
             if (id == null)
             {
                 return default(int);
             }
-            return (int)TypeDescriptor.GetConverter(typeof(int)).ConvertFromInvariantString(id);
+
+            return Convert.ToInt32(id);
         }
 
         /// <summary>

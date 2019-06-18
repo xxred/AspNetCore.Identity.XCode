@@ -8,12 +8,12 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 namespace AspNetCore.Identity.XCode
 {
     /// <summary>
-    /// Contains extension methods to <see cref="IdentityBuilder"/> for adding entity framework stores.
+    /// Contains extension methods to <see cref="IdentityBuilder"/> for adding xcode stores.
     /// </summary>
-    public static class IdentityEntityFrameworkBuilderExtensions
+    public static class IdentityXCodeBuilderExtensions
     {
         /// <summary>
-        /// Adds an Entity Framework implementation of identity information stores.
+        /// Adds an XCode implementation of identity information stores.
         /// </summary>
         /// <param name="builder">The <see cref="IdentityBuilder"/> instance this method extends.</param>
         /// <returns>The <see cref="IdentityBuilder"/> instance this method extends.</returns>
@@ -23,12 +23,26 @@ namespace AspNetCore.Identity.XCode
             return builder;
         }
 
+        /// <summary>
+        /// Adds an XCode implementation of identity.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IdentityBuilder AddIdentityXCode(this IServiceCollection services)
+        {
+            return services.AddIdentityCore<IdentityUser>()
+                 .AddRoles<IdentityRole>()
+                 .AddXCodeStores()
+                 .AddSignInManager()
+                 .AddDefaultTokenProviders();
+        }
+
         private static void AddStores(IServiceCollection services, Type userType, Type roleType)
         {
             var identityUserType = FindGenericBaseType(userType, typeof(IdentityUser<>));
             if (identityUserType == null)
             {
-                throw new InvalidOperationException("只能使用从IdentityUser<TKey>派生的用户调用AddXCodeStores");
+                throw new InvalidOperationException("只能使用从IdentityUser<TEntity>派生的用户调用AddXCodeStores");
             }
 
             if (roleType != null)
@@ -36,9 +50,9 @@ namespace AspNetCore.Identity.XCode
                 var identityRoleType = FindGenericBaseType(roleType, typeof(IdentityRole<>));
                 if (identityRoleType == null)
                 {
-                    throw new InvalidOperationException("只能使用从IdentityRole<TKey>派生的角色调用AddXCodeStores");
+                    throw new InvalidOperationException("只能使用从IdentityRole<TEntity>派生的角色调用AddXCodeStores");
                 }
-                
+
                 var userStoreType = typeof(UserStore<>).MakeGenericType(userType);
                 var roleStoreType = typeof(RoleStore<>).MakeGenericType(roleType);
 

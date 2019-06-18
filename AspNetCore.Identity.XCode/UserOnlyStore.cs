@@ -61,33 +61,7 @@ namespace AspNetCore.Identity.XCode
         public UserOnlyStore(IdentityErrorDescriber describer = null) : base(describer ?? new IdentityErrorDescriber())
         {
         }
-
-        ///// <summary>
-        ///// Gets the database context for this store.
-        ///// </summary>
-        //public TContext Context { get; private set; }
-
-        ///// <summary>
-        ///// DbSet of users.
-        ///// </summary>
-        //protected DbSet<TUser> UsersSet { get { return Context.Set<TUser>(); } }
-
-        ///// <summary>
-        ///// DbSet of user claims.
-        ///// </summary>
-        //protected DbSet<TUserClaim> UserClaims { get { return Context.Set<TUserClaim>(); } }
-
-        ///// <summary>
-        ///// DbSet of user logins.
-        ///// </summary>
-        //protected DbSet<TUserLogin> UserLogins { get { return Context.Set<TUserLogin>(); } }
-
-        ///// <summary>
-        ///// DbSet of user tokens.
-        ///// </summary>
-        //protected DbSet<TUserToken> UserTokens { get { return Context.Set<TUserToken>(); } }
-
-
+        
         /// <summary>
         /// Creates the specified <paramref name="user"/> in the user store.
         /// </summary>

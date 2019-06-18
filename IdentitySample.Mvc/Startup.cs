@@ -1,22 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AspNetCore.Identity.XCode;
+﻿using AspNetCore.Identity.XCode;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using IdentitySample.Mvc.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Identity;
-//using Extensions.Identity.Stores.XCode;
-using IdentityUser = Extensions.Identity.Stores.XCode.IdentityUser;
-using IdentityRole = Extensions.Identity.Stores.XCode.IdentityRole;
 
 namespace IdentitySample.Mvc
 {
@@ -40,11 +30,7 @@ namespace IdentitySample.Mvc
             });
 
             // Identity配置
-            services.AddIdentityCore<IdentityUser>()
-                .AddRoles<IdentityRole>()
-                .AddXCodeStores()
-                .AddSignInManager()
-                .AddDefaultTokenProviders()
+            services.AddIdentityXCode()
                 .AddDefaultUI(UIFramework.Bootstrap4);
 
             services.AddAuthentication(o =>
