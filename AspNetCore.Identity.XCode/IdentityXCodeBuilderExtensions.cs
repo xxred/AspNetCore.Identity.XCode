@@ -1,4 +1,4 @@
-using System;
+锘縰sing System;
 using System.Reflection;
 using Extensions.Identity.Stores.XCode;
 using Microsoft.AspNetCore.Identity;
@@ -28,13 +28,25 @@ namespace AspNetCore.Identity.XCode
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
+        public static IdentityBuilder AddIdentityXCode<TUser, TRole>(this IServiceCollection services)
+        where TUser : IdentityUser<TUser>, new()
+        where TRole : IdentityRole<TRole>, new()
+        {
+            return services.AddIdentityCore<TUser>()
+                .AddRoles<TRole>()
+                .AddXCodeStores()
+                .AddSignInManager()
+                .AddDefaultTokenProviders();
+        }
+
+        /// <summary>
+        /// Adds an XCode implementation of identity.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
         public static IdentityBuilder AddIdentityXCode(this IServiceCollection services)
         {
-            return services.AddIdentityCore<IdentityUser>()
-                 .AddRoles<IdentityRole>()
-                 .AddXCodeStores()
-                 .AddSignInManager()
-                 .AddDefaultTokenProviders();
+            return services.AddIdentityXCode<IdentityUser, IdentityRole>();
         }
 
         private static void AddStores(IServiceCollection services, Type userType, Type roleType)
@@ -42,7 +54,7 @@ namespace AspNetCore.Identity.XCode
             var identityUserType = FindGenericBaseType(userType, typeof(IdentityUser<>));
             if (identityUserType == null)
             {
-                throw new InvalidOperationException("只能使用从IdentityUser<TEntity>派生的用户调用AddXCodeStores");
+                throw new InvalidOperationException("鍙兘浣跨敤浠嶪dentityUser<TEntity>娲剧敓鐨勭敤鎴疯皟鐢ˋddXCodeStores");
             }
 
             if (roleType != null)
@@ -50,7 +62,7 @@ namespace AspNetCore.Identity.XCode
                 var identityRoleType = FindGenericBaseType(roleType, typeof(IdentityRole<>));
                 if (identityRoleType == null)
                 {
-                    throw new InvalidOperationException("只能使用从IdentityRole<TEntity>派生的角色调用AddXCodeStores");
+                    throw new InvalidOperationException("鍙兘浣跨敤浠嶪dentityRole<TEntity>娲剧敓鐨勮鑹茶皟鐢ˋddXCodeStores");
                 }
 
                 var userStoreType = typeof(UserStore<>).MakeGenericType(userType);

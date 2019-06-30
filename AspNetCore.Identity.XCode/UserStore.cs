@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -98,7 +98,7 @@ namespace AspNetCore.Identity.XCode
                 throw new ArgumentNullException(nameof(user));
             }
             user.Save();
-            
+
             return Task.FromResult(IdentityResult.Success);
         }
 
@@ -125,7 +125,7 @@ namespace AspNetCore.Identity.XCode
             }
             catch (Exception)
             {
-                
+
                 return Task.FromResult(IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure()));
             }
             return Task.FromResult(IdentityResult.Success);
@@ -275,7 +275,7 @@ namespace AspNetCore.Identity.XCode
             var roleEntity = await FindRoleAsync(normalizedRoleName, cancellationToken);
             if (roleEntity == null)
             {
-                throw new InvalidOperationException($"ÕÒ²»µ½ÃûÎª{normalizedRoleName}µÄ½ÇÉ«");
+                throw new InvalidOperationException($"ï¿½Ò²ï¿½ï¿½ï¿½ï¿½ï¿½Îª{normalizedRoleName}ï¿½Ä½ï¿½É«");
             }
 
             CreateUserRole(user, roleEntity).Save();
@@ -334,7 +334,7 @@ namespace AspNetCore.Identity.XCode
         /// <param name="user">The user whose role membership should be checked.</param>
         /// <param name="normalizedRoleName">The role to check membership of</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
-        /// <returns>A <see cref="Task{TResult}"/> containing a flag indicating if the specified user is a member of the given group. If the 
+        /// <returns>A <see cref="Task{TResult}"/> containing a flag indicating if the specified user is a member of the given group. If the
         /// user is a member of the group the returned value with be true, otherwise it will be false.</returns>
         public override async Task<bool> IsInRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -569,7 +569,7 @@ namespace AspNetCore.Identity.XCode
         /// <param name="claim">The claim whose users should be retrieved.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>
-        /// The <see cref="Task"/> contains a list of users, if any, that contain the specified claim. 
+        /// The <see cref="Task"/> contains a list of users, if any, that contain the specified claim.
         /// </returns>
         public override Task<IList<TUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -591,7 +591,7 @@ namespace AspNetCore.Identity.XCode
         /// <param name="normalizedRoleName">The role whose users should be retrieved.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>
-        /// The <see cref="Task"/> contains a list of users, if any, that are in the specified role. 
+        /// The <see cref="Task"/> contains a list of users, if any, that are in the specified role.
         /// </returns>
         public override async Task<IList<TUser>> GetUsersInRoleAsync(string normalizedRoleName, CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -609,7 +609,7 @@ namespace AspNetCore.Identity.XCode
                 var userRoles = IdentityUserRole<TUserRole>.FindAllByRoleId(role.Id);
                 var users = IdentityUser<TUser>.FindAllByIds(userRoles.Select(s => s.UserId).ToList());
 
-                 return users;
+                return users;
             }
 
             return new List<TUser>();

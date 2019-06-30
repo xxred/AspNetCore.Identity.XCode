@@ -1,4 +1,4 @@
-// Copyright (c) .NET Foundation. All rights reserved.
+﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
@@ -61,7 +61,7 @@ namespace AspNetCore.Identity.XCode
         public UserOnlyStore(IdentityErrorDescriber describer = null) : base(describer ?? new IdentityErrorDescriber())
         {
         }
-        
+
         /// <summary>
         /// Creates the specified <paramref name="user"/> in the user store.
         /// </summary>
@@ -191,7 +191,7 @@ namespace AspNetCore.Identity.XCode
         /// <returns>The user login if it exists.</returns>
         protected override Task<TUserLogin> FindUserLoginAsync(int userId, string loginProvider, string providerKey, CancellationToken cancellationToken)
         {
-            return Task.FromResult(IdentityUserLogin<TUserLogin>.FindByUserIdAndLoginProviderAndProviderKey(userId,loginProvider, providerKey));
+            return Task.FromResult(IdentityUserLogin<TUserLogin>.FindByUserIdAndLoginProviderAndProviderKey(userId, loginProvider, providerKey));
         }
 
         /// <summary>
@@ -219,7 +219,7 @@ namespace AspNetCore.Identity.XCode
             {
                 throw new ArgumentNullException(nameof(user));
             }
-            
+
             return Task.FromResult((IList<Claim>)IdentityUserClaim<TUserClaim>.FindAllByUserId(user.Id).Select(c => c.ToClaim()).ToList());
         }
 
@@ -273,7 +273,7 @@ namespace AspNetCore.Identity.XCode
             }
 
             var matchedClaims = IdentityUserClaim<TUserClaim>.FindAllByUserIdAndTypeAndValue(user.Id, claim.Type, claim.Value);
-         
+
             foreach (var matchedClaim in matchedClaims)
             {
                 matchedClaim.ClaimValue = newClaim.Value;
@@ -304,7 +304,7 @@ namespace AspNetCore.Identity.XCode
             foreach (var claim in claims)
             {
 
-                var matchedClaims = IdentityUserClaim<TUserClaim>.FindAllByUserIdAndTypeAndValue(user.Id, claim.Type,claim.Value);
+                var matchedClaims = IdentityUserClaim<TUserClaim>.FindAllByUserIdAndTypeAndValue(user.Id, claim.Type, claim.Value);
                 matchedClaims.Delete();
             }
 
@@ -420,7 +420,7 @@ namespace AspNetCore.Identity.XCode
         /// <param name="claim">The claim whose users should be retrieved.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> used to propagate notifications that the operation should be canceled.</param>
         /// <returns>
-        /// The <see cref="Task"/> contains a list of users, if any, that contain the specified claim. 
+        /// The <see cref="Task"/> contains a list of users, if any, that contain the specified claim.
         /// </returns>
         public override Task<IList<TUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default(CancellationToken))
         {
